@@ -1,51 +1,51 @@
-from rest_framework import viewsets, status
+from django.shortcuts import get_object_or_404
+from rest_framework import status, viewsets
+from rest_framework.decorators import action
+from rest_framework.generics import (
+    CreateAPIView,
+    DestroyAPIView,
+    ListAPIView,
+    ListCreateAPIView,
+    RetrieveAPIView,
+    RetrieveUpdateDestroyAPIView,
+    UpdateAPIView,
+)
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from .models import Book
 from .serializers import BookSerializer
-from rest_framework.decorators import action
-from rest_framework.views import APIView
-from django.shortcuts import get_object_or_404
-from rest_framework.generics import (
-    ListAPIView,
-    RetrieveAPIView,
-    CreateAPIView,
-    UpdateAPIView,
-    DestroyAPIView,
-    ListCreateAPIView,
-    RetrieveUpdateDestroyAPIView
-)
-
 
 """
 Представления на разных видах View
     -viewsets.ModelViewSet (+доп.маршрут через @action)
     -APIView
-    -1-й вид Дженериков: ListAPIView, CreateAPIView, RetrieveAPIView, UpdateAPIView, DestroyAPIView 
+    -1-й вид Дженериков: ListAPIView, CreateAPIView, RetrieveAPIView, UpdateAPIView, DestroyAPIView
     -2-й вид Дженериков: ListCreateAPIView, RetrieveUpdateDestroyAPIView
 """
 
 
 class BookViewSet(viewsets.ModelViewSet):
     """
-        ViewSet для модели Book. Обеспечивает стандартные операции:
-        - GET /books/ (список)
-        - POST /books/
-        - GET /books/{id}/ (детали)
-        - PUT /books/{id}/
-        - DELETE /books/{id}/
-        - PATCH
+    ViewSet для модели Book. Обеспечивает стандартные операции:
+    - GET /books/ (список)
+    - POST /books/
+    - GET /books/{id}/ (детали)
+    - PUT /books/{id}/
+    - DELETE /books/{id}/
+    - PATCH
     """
-    queryset = Book.objects.all().order_by('-id')
+
+    queryset = Book.objects.all().order_by("-id")
     serializer_class = BookSerializer
 
-    @action(detail=False, methods=['get'], url_path='latest')
+    @action(detail=False, methods=["get"], url_path="latest")
     def latest_books(self, request):
         """
-       Возвращает последние 5 книг
-       GET /books/latest/
-       """
-        books = Book.objects.order_by('-year_of_release')[:5]
+        Возвращает последние 5 книг
+        GET /books/latest/
+        """
+        books = Book.objects.order_by("-year_of_release")[:5]
         serializer = self.get_serializer(books, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -57,10 +57,10 @@ class BookListCreateAPIView(APIView):
     """
 
     def get(self, request, *args, **kwargs):
-        books = Book.objects.order_by('-id')
-        search = request.query_params.get('search')
+        books = Book.objects.order_by("-id")
+        search = request.query_params.get("search")
         if search:
-            print('[!] search:', search)
+            print("[!] search:", search)
             books = books.filter(title__icontains=search)
 
         return Response(
@@ -102,7 +102,9 @@ class BookDetailAPIView(APIView):
         """
         book = self.get_object(pk)
         if not book:
-            return Response({'error': 'Книга не найдена'}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {"error": "Книга не найдена"}, status=status.HTTP_404_NOT_FOUND
+            )
         serializer = BookSerializer(book).data
         return Response(serializer, status=status.HTTP_200_OK)
 
@@ -113,7 +115,9 @@ class BookDetailAPIView(APIView):
         """
         book = self.get_object(pk)
         if not book:
-            return Response({'error': 'Книга не найдена'}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {"error": "Книга не найдена"}, status=status.HTTP_404_NOT_FOUND
+            )
         book.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -124,7 +128,9 @@ class BookDetailAPIView(APIView):
         """
         book = self.get_object(pk)
         if not book:
-            return Response({'error': 'Книга не найдена'}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {"error": "Книга не найдена"}, status=status.HTTP_404_NOT_FOUND
+            )
         serializer = BookSerializer(book, data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -138,8 +144,12 @@ class BookDetailAPIView(APIView):
         """
         book = self.get_object(pk)
         if not book:
-            return Response({'error': 'Книга не найдена'}, status=status.HTTP_404_NOT_FOUND)
-        serializer = BookSerializer(book, data=request.data, partial=True)  # Частичное обновление
+            return Response(
+                {"error": "Книга не найдена"}, status=status.HTTP_404_NOT_FOUND
+            )
+        serializer = BookSerializer(
+            book, data=request.data, partial=True
+        )  # Частичное обновление
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -147,13 +157,13 @@ class BookDetailAPIView(APIView):
 
 
 class BookListCreateGenericView(ListAPIView, CreateAPIView):
-    queryset = Book.objects.all().order_by('-id')
+    queryset = Book.objects.all().order_by("-id")
     serializer_class = BookSerializer
 
     """
     ❓ Можно ли удалить методы get() и post()?
     да, можно!
-    Потому что:    
+    Потому что:
         ListAPIView уже имеет метод get(), который вызывает self.list(...)
         CreateAPIView уже имеет метод post(), который вызывает self.create(...)
     """
@@ -182,8 +192,9 @@ class BookDetailUpdateDeleteView(RetrieveAPIView, UpdateAPIView, DestroyAPIView)
 
 
 class BookListCreateGenericView2(ListCreateAPIView):
-    queryset = Book.objects.all().order_by('-id')
+    queryset = Book.objects.all().order_by("-id")
     serializer_class = BookSerializer
+
 
 class BookDetailUpdateDestroyView2(RetrieveUpdateDestroyAPIView):
     queryset = Book.objects.all()

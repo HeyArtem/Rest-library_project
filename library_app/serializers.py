@@ -1,8 +1,8 @@
+from datetime import datetime
+
 from rest_framework import serializers
-from rest_framework.serializers import Serializer
 
 from .models import Book
-from datetime import datetime
 
 
 class BookSerializer(serializers.ModelSerializer):
@@ -16,7 +16,6 @@ class BookSerializer(serializers.ModelSerializer):
             "picture",
             "library",
             "genre",
-
         )
 
     def validate_year_of_release(self, year):

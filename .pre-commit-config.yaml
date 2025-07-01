@@ -1,0 +1,62 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-json
+
+  - repo: https://github.com/psf/black
+    rev: 23.9.1
+    hooks:
+      - id: black
+        require_serial: true
+        exclude: ^notes/
+
+  - repo: https://github.com/pre-commit/mirrors-isort
+    rev: v5.10.1
+    hooks:
+      - id: isort
+        args: [ "--profile", "black" ]
+        exclude: ^notes/
+
+  - repo: https://github.com/PyCQA/flake8
+    rev: 6.1.0
+    hooks:
+      - id: flake8
+        args: [--max-line-length=200]
+        exclude:
+          '^notes/|
+          ^models_app/admin/__init__.py|
+          ^models_app/models/__init__.py|
+          ^models_app/migrations/'
+
+  - repo: https://github.com/asottile/pyupgrade
+    rev: v3.11.0
+    hooks:
+      - id: pyupgrade
+        exclude: ^notes/
+
+
+
+#trailing-whitespace
+#  проверки конечных пробелов
+
+#end-of-file-fixer
+#  Следит за тем, чтобы файлы заканчивались новой строкой и только новой строкой.
+
+#check-yaml
+#  Пытается загрузить все файлы YAML для проверки синтаксиса.
+
+#check-json
+#  Пытается загрузить все файлы JSON для проверки синтаксиса.
+
+#black
+#  единый стиль кода, форматирование, единообразие
+
+#isort
+#  для сортировки импорта в алфавитном порядке и автоматического разделения на разделы и по типу.
+
+#pyupgrade
+#  для автоматического обновления синтаксиса для новых версий языка.
