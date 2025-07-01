@@ -1,4 +1,4 @@
-![alt-текст](https://github.com/HeyArtem/Rest-library_project/tree/main/notes/rest_framework.jpg "Baner")
+![Банер]( "Baner")
 
 
 # Тренерую django rest framework.
